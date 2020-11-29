@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar dark color="#18181e" app>
+  <v-app-bar dark app>
     <h1 class="headline">TodoApp</h1>
     <v-spacer />
     <v-btn @click="logout" outlined>Logout</v-btn>

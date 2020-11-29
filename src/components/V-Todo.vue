@@ -1,14 +1,20 @@
 <template>
-  <v-card>
+  <v-card :dark="dark">
     <v-container>
       <v-checkbox class="left" v-model="rawCompleted"></v-checkbox>
-      <v-card-title class="ml-2 word-wrap">{{ title }}</v-card-title>
+      <v-btn @click="$emit('delete-todo')" class="right" text rounded color="red">
+        <v-icon>mdi-delete-outline</v-icon>
+      </v-btn>
+      <v-card-title
+        :class="{ 'ml-2': true, 'word-wrap': true, 'text-decoration-line-through': completed }"
+        >{{ title }}</v-card-title
+      >
       <div class="text-align-right">
         <v-badge
           class="d-block ml-auto"
           inline
           :color="color"
-          :content="badgeText"
+          :content="rawBadgeText"
           :value="badge === 0 ? false : true"
         ></v-badge>
       </div>
@@ -25,25 +31,30 @@ export default {
     const color = computed(() => {
       if (props.badge === 1) return 'primary';
       if (props.badge === 2) return 'warning';
-      if (props.badge === 3) return 'danger';
+      if (props.badge === 3) return 'error';
       return 'transperant';
     });
+
     const rawCompleted = computed({
       get: () => props.completed,
       set: () => emit('toggle-completed'),
     });
 
+    const rawBadgeText = computed(() => {
+      if (props.badgeText) return props.badgeText;
+      if (!props.badgeText && props.badge === 1) return 'Normal';
+      if (!props.badgeText && props.badge === 2) return 'Primary';
+      if (!props.badgeText && props.badge === 3) return 'Critical';
+      return '';
+    });
+
     return {
       color,
       rawCompleted,
+      rawBadgeText,
     };
   },
   props: {
-    id: {
-      type: String,
-      required: true,
-      default: '',
-    },
     title: {
       type: String,
       required: true,
@@ -64,6 +75,11 @@ export default {
       required: true,
       default: '',
     },
+    dark: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
 };
 </script>
@@ -72,7 +88,13 @@ export default {
 .left {
   position: absolute;
   left: 5px;
-  top: 41%;
+  top: 35%;
+  transform: translateY(-50%);
+}
+.right {
+  position: absolute;
+  right: 5px;
+  top: 40%;
   transform: translateY(-50%);
 }
 .word-wrap {

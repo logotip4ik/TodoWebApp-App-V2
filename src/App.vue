@@ -1,19 +1,28 @@
 <template>
-  <v-app id="app">
-    <v-main>
+  <v-app id="app" :class="{ 'bg-dark': dark }" :dark="dark">
+    <v-main :dark="dark">
       <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import { useActions } from '@u3u/vue-hooks';
+import { useActions, useState } from '@u3u/vue-hooks';
 
 export default {
   name: 'App',
   setup() {
     const { reAuth } = useActions('auth', ['reAuth']);
     reAuth();
+
+    const { dark } = useState(['dark']);
+    const { toggleDarkMode } = useActions(['toggleDarkMode']);
+
+    if (localStorage.dark) {
+      toggleDarkMode(JSON.parse(localStorage.dark));
+    }
+
+    return { dark };
   },
 };
 </script>
@@ -35,6 +44,9 @@ export default {
 
   .font-weight-200 {
     font-weight: 200;
+  }
+  &.bg-dark {
+    background-color: #121212 !important;
   }
 }
 .fade-enter-active,

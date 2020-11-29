@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: 'Overlay',
+  name: 'Overlay-Loading',
   props: {
     show: {
       type: Boolean,

@@ -27,7 +27,7 @@ export default {
     login({ state }) {
       state.loading = true;
       async function receiveMessage(event) {
-        if (!event.origin.startsWith('http://localhost:3030')) {
+        if (!event.origin.startsWith('https://todowebapp-f.herokuapp.com')) {
           console.log('invalid origin', event.origin);
         } else {
           feathers
@@ -45,7 +45,7 @@ export default {
       window.addEventListener('message', receiveMessage, {
         once: true,
       });
-      window.open('http://localhost:3030/oauth/github');
+      window.open('https://todowebapp-f.herokuapp.com/oauth/github');
     },
   },
 };

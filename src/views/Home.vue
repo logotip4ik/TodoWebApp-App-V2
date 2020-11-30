@@ -1,9 +1,9 @@
 <template>
   <v-container>
-    <h1 class="mb-4">Home Page</h1>
+    <h1 :class="{ 'mb-4': true, 'white--text': dark }">Home Page</h1>
     <transition mode="out-in" name="fade">
       <h2 class="font-weight-200" v-if="loading">Loging you in...</h2>
-      <v-btn outlined color="#18181e" v-else @click="login">Login with Github</v-btn>
+      <v-btn outlined :dark="dark" v-else @click="login">Login with Github</v-btn>
     </transition>
   </v-container>
 </template>
@@ -16,6 +16,7 @@ export default {
   name: 'Home',
   setup() {
     const { router } = useRouter();
+    const { dark } = useState(['dark']);
     const { user, loading } = useState('auth', ['user', 'loading']);
 
     const { login } = useActions('auth', ['login']);
@@ -23,6 +24,7 @@ export default {
     watch(user, () => (user.value ? router.push({ name: 'Todos' }) : null));
 
     return {
+      dark,
       login,
       loading,
     };

@@ -1,5 +1,5 @@
 <template>
-  <v-card :dark="dark">
+  <v-card :dark="dark" @click.right.prevent="$emit('show-modal', $event)">
     <v-container>
       <v-checkbox class="left" v-model="rawCompleted"></v-checkbox>
       <v-btn @click="$emit('delete-todo')" class="right" text rounded color="red">

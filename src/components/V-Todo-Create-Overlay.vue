@@ -89,7 +89,6 @@ export default {
         badge: todoBadge.value,
         badgeText: todoBadgeText.value.trim(),
       };
-      console.log(newTODO);
       emit('save-todo', newTODO);
       resetForm();
     }

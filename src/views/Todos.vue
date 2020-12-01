@@ -2,34 +2,18 @@
   <div :class="{ 'bg-dark': rawDark }">
     <VNavbar></VNavbar>
     <v-container>
-      <v-fade-transition group hide-on-leave mode="out-in" v-if="!filteredTodos">
+      <v-fade-transition group hide-on-leave mode="out-in">
         <VTodo
           class="mb-4"
-          v-for="(todo, idx) in todos"
+          v-for="todo in rawTodos"
           :dark="rawDark"
           :key="todo._id"
           :title="todo.title"
           :completed="todo.completed"
           :badge="todo.badge | badgeInt"
           :badgeText="todo.badgeText"
-          @show-modal="showModal($event, idx)"
-          @toggle-completed="toggleCompleted(idx)"
-          @delete-todo="removeTodo(todo._id)"
-        ></VTodo>
-      </v-fade-transition>
-      <!-- TODO: Just rethink this filter⚒  -->
-      <v-fade-transition group hide-on-leave mode="out-in" v-else>
-        <VTodo
-          class="mb-4"
-          v-for="(todo, idx) in filteredTodos"
-          :dark="rawDark"
-          :key="todo._id"
-          :title="todo.title"
-          :completed="todo.completed"
-          :badge="todo.badge | badgeInt"
-          :badgeText="todo.badgeText"
-          @show-modal="showModal($event, idx)"
-          @toggle-completed="toggleCompleted(idx, true)"
+          @show-modal="showModal($event, todo)"
+          @toggle-completed="toggleCompleted(todo)"
           @delete-todo="removeTodo(todo._id)"
         ></VTodo>
       </v-fade-transition>
@@ -57,8 +41,8 @@
           <v-icon v-if="rawDark">mdi-white-balance-sunny</v-icon>
           <v-icon v-else>mdi-weather-night</v-icon>
         </v-btn>
-        <v-btn disabled fab outlined :dark="rawDark" @click="filterTodos">
-          <v-icon v-if="!filteredTodos">mdi-filter-variant</v-icon>
+        <v-btn fab outlined :dark="rawDark" @click="filterTodos">
+          <v-icon v-if="visibility === 'all'">mdi-filter-variant</v-icon>
           <v-icon v-else>mdi-filter-variant-remove</v-icon>
         </v-btn>
       </v-speed-dial>
@@ -100,6 +84,11 @@ import VMenu from '../components/V-Menu.vue';
 import VModalInfo from '../components/V-Modal-Info.vue';
 import VModalEdit from '../components/V-Modal-Edit.vue';
 
+const filters = {
+  all: (todos) => todos,
+  active: (todos) => todos.filter((todo) => !todo.completed),
+};
+
 export default {
   name: 'Todos',
   setup() {
@@ -129,7 +118,7 @@ export default {
       set: () => toggleDarkMode(),
     });
 
-    const filteredTodos = ref(null);
+    const visibility = ref('all');
     const creatingTodo = ref(false);
     const isOpenFab = ref(false);
     const isOpenMenu = ref(false);
@@ -139,6 +128,8 @@ export default {
     const menuY = ref(0);
     const opendMenuOn = ref({});
 
+    const rawTodos = computed(() => filters[visibility.value](todos.value));
+
     // This gets all todos and starts listening for changes
     listen();
 
@@ -147,12 +138,8 @@ export default {
       createTodo(todo);
     }
 
-    function toggleCompleted(idx, fromFiltered = false) {
-      if (fromFiltered) {
-        updateTodo({ ...filteredTodos.value[idx], completed: !filteredTodos.value[idx].completed });
-      } else {
-        updateTodo({ ...todos.value[idx], completed: !todos.value[idx].completed });
-      }
+    function toggleCompleted(todo) {
+      updateTodo({ ...todo, completed: !todo.completed });
     }
 
     function updateExistingTodo(item) {
@@ -161,23 +148,24 @@ export default {
     }
 
     function filterTodos() {
-      if (!filteredTodos.value) {
-        filteredTodos.value = todos.value.filter((item) => !item.completed);
+      if (visibility.value === 'all') {
+        visibility.value = 'active';
       } else {
-        filteredTodos.value = null;
+        visibility.value = 'all';
       }
     }
 
-    function showModal(ev, idx) {
+    function showModal(ev, todo) {
       menuX.value = ev.clientX;
       menuY.value = ev.clientY;
-      opendMenuOn.value = todos.value[idx];
+      opendMenuOn.value = todo;
       isOpenMenu.value = true;
     }
 
     return {
-      todos,
+      rawTodos,
       rawDark,
+      visibility,
       loading,
       isOpenFab,
       isOpenMenu,
@@ -186,7 +174,6 @@ export default {
       opendMenuOn,
       showInfo,
       showEdit,
-      filteredTodos,
       filterTodos,
       saveTodo,
       showModal,

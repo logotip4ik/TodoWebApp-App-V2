@@ -20,15 +20,15 @@ export default {
         state.user = await feathers.reAuthenticate();
         /* eslint-disable-next-line */
       } catch (error) {
-        console.log({ error });
+        console.error(error);
       }
       state.loading = false;
     },
     login({ state }) {
       state.loading = true;
       async function receiveMessage(event) {
-        if (!event.origin.startsWith('https://todowebapp-f.herokuapp.com')) {
-          console.log('invalid origin', event.origin);
+        if (!event.origin.startsWith('http://localhost:3030')) {
+          console.error('invalid origin', event.origin);
         } else {
           feathers
             .authenticate({
@@ -45,7 +45,7 @@ export default {
       window.addEventListener('message', receiveMessage, {
         once: true,
       });
-      window.open('https://todowebapp-f.herokuapp.com/oauth/github');
+      window.open('http://localhost:3030/oauth/github');
     },
   },
 };
